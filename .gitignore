@@ -1,0 +1,6 @@
+/**/cljs-runtime
+/**/node_modules
+/**/manifest.edn
+/.shadow-cljs
+/**/generated/**/*.js
+/**/*.js

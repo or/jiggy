@@ -1,0 +1,24 @@
+{
+  "name": "jiggy",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "deps": "npm install",
+    "api:watch": "shadow-cljs watch api",
+    "api:release": "shadow-cljs release api"
+  },
+  "devDependencies": {
+    "shadow-cljs": "2.8.90",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-appsync-offline": "^1.4.0",
+    "serverless-offline": "^5.12.1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.632.0",
+    "highlight.js": "9.15.10",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
+    "react-flip-move": "^3.0.4",
+    "react-highlight.js": "^1.0.7"
+  }
+}

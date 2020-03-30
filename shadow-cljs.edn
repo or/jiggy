@@ -20,7 +20,7 @@
  :builds {:main {:target :browser
                  :modules {:main {:entries [jiggy.client]}}
                  :output-dir "client/js/generated"
-                 :asset-path "js"
+                 :asset-path "js/generated"
                  :devtools {:before-load jiggy.client/stop
                             :after-load jiggy.client/start
                             :http-root "client"

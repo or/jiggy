@@ -1,6 +1,7 @@
 (ns jiggy.views
   (:require
    [clojure.string :as s]
+   [jiggy.catmullrom :as cmr]
    [re-frame.core :as rf]
    [reagent.core :as r]))
 
@@ -16,7 +17,7 @@
 
 
 (def image-pattern
-  (let [image-url "/img/8bit.gif"]
+  (let [image-url "img/8bit.gif"]
     [:pattern {:id      "image"
                :x       "0"
                :y       "0"
@@ -89,6 +90,12 @@
        filter-glow
        image-pattern]))
 
+(defn transform [points width height]
+  (map (fn [l]
+         (map (fn [[x y]]
+                [(* x width)
+                 (* y height)]) l)) points))
+
 (defn app
   []
   [:div
@@ -98,26 +105,31 @@
     "jigsaw-height:" [integer-field :jigsaw-height]
     "eccentricity:" [integer-field :eccentricity]
     [:button {:on-click #(rf/dispatch [:generate-jigsaw])} "generate jigsaw"]]
-   [:svg {:style               {:width      "100%"
+   [:svg {:style               {:display    "block"
+                                :width      "100%"
                                 :height     "90vh"
                                 :border     "#888 1px solid"
                                 :background "url('img/felt-table.jpg')"}
-          :viewBox             "0 0 1000 600"
+          :viewBox             "0 0 1400 600"
           :preserveAspectRatio "xMidYMin meet"}
     [defs]
     (let [width  540
           height 810
           jigsaw @(rf/subscribe [:jigsaw])]
-      (into
-       [:g
-        [:rect {:width  width
-                :height height
-                :style  {:fill "url('#image')"}}]]
-       (map-indexed (fn [r row]
-                      (map-indexed (fn [c point]
-                                     ^{:key [c r]} [:circle {:cx    (* (:x point) width)
-                                                             :cy    (* (:y point) height)
-                                                             :r     4
-                                                             :style {:fill "#ddd"}
-                                                             }]) row)) (:points jigsaw))
-       ))]])
+      [:g
+       [:rect {:width  width
+               :height height
+               :style  {:fill "url('#image')"}}]
+       (into  [:g]   (map (fn [[key curve]]
+                            ^{:key key} [:path {:d     (cmr/curve->svg-path (transform curve width height))
+                                                :style {:fill           "none"
+                                                        :stroke         "#888"
+                                                        :stroke-width   1
+                                                        :stroke-linecap "round"}}]) (:curves jigsaw)))
+       #_(into [:g] (map (fn [[[c r] point]]
+                           ^{:key [c r]} [:circle {:cx    (* (:x point) width)
+                                                   :cy    (* (:y point) height)
+                                                   :r     4
+                                                   :style {:fill "#ddd"}
+                                                   }]) (:points jigsaw)))]
+      )]])

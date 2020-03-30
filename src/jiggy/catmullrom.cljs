@@ -22,7 +22,8 @@
   (->> (concat [(first points)] points [(last points)])
        (map (juxt :x :y))
        (partition 4 1)
-       (map (partial calculate-cubic-bezier-curve tension))))
+       (map (partial calculate-cubic-bezier-curve tension))
+       (vec)))
 
 ;; svg
 

@@ -4,7 +4,7 @@
    [jiggy.jigsaw :as jigsaw]))
 
 (def  default-db
-  {:eccentricity  5
+  {:eccentricity  20
    :jigsaw-width  10
    :jigsaw-height 15})
 
@@ -21,5 +21,4 @@
 (rf/reg-event-db
  :generate-jigsaw
  (fn [db [_]]
-   (println db)
    (assoc db :jigsaw (jigsaw/generate db))))

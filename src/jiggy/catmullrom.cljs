@@ -30,8 +30,11 @@
 (defn svg-move-to [[x y]]
   (str "M" x "," y))
 
-(defn svg-curve-to [[_ cp1 cp2 p2]]
-  (str "C" (string/join "," (flatten [cp1 cp2 p2]))))
+(defn svg-curve-to [[_ cp0 cp1 p1]]
+  (str "C" (string/join "," (flatten [cp0 cp1 p1]))))
+
+(defn svg-line-to [[_ _ _ p2]]
+  (str "L" (string/join "," p2)))
 
 (defn curve->svg-path [curve]
   (let [start (first (first curve))]

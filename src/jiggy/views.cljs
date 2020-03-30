@@ -106,37 +106,35 @@
     "jigsaw-height:" [integer-field :jigsaw-height]
     "eccentricity:" [integer-field :eccentricity]
     [:button {:on-click #(rf/dispatch [:generate-jigsaw])} "generate jigsaw"]]
-   [:svg {:style               {:display    "block"
-                                :width      "100%"
-                                :height     "90vh"
-                                :border     "#888 1px solid"
-                                :background "url('img/felt-table.jpg')"}
-          :viewBox             "0 0 1600 600"
-          :preserveAspectRatio "xMidYMin meet"}
+   [:svg.gpu {:style               {:display    "block"
+                                    :width      "1600"
+                                    :height     "900"
+                                    :border     "#888 1px solid"
+                                    :background "url('img/felt-table.jpg')"}
+              :viewBox             "0 0 1600 600"
+              :preserveAspectRatio "xMidYMin meet"}
     [defs]
     (let [width  540
           height 810
           jigsaw @(rf/subscribe [:jigsaw])]
       [:g
-       [:rect {:width  width
-               :height height
-               :style  {:fill "url('#image')"}}]
+       [:rect.gpu {:width  width
+                   :height height
+                   :style  {:fill "url('#image')"}}]
        (into [:g] (map (fn [[key curve]]
                          ^{:key key} [:path {:d     (cmr/curve->svg-path (transform curve width height))
-                                             :style {:fill           "none"
-                                                     :stroke         "#888"
-                                                     :stroke-width   1
-                                                     :stroke-linecap "round"}}]) (:curves jigsaw)))
+                                             :style {:fill         "none"
+                                                     :stroke       "#888"
+                                                     :stroke-width 1
+                                                     }}]) (:curves jigsaw)))
        (into [:g {:transform "translate(600,0)"}]
              (map (fn [piece]
                     ^{:key (:id piece)}
-                    [:g {:transform (str "translate(" (* (:pos-x piece) 1.5 width) "," (* (:pos-y piece) 1.5 height) ")")}
-                     [:path {:transform (str "translate(" (* (:pos-x piece) -1 width) "," (* (:pos-y piece) -1 height) ")")
-                             :d         (cmr/curve->svg-path (transform (:curve piece) width height))
-                             :style     {:fill             "url('#image')"
-                                         :stroke           "#888"
-                                         :stroke-width     1
-                                         :stroke-linecap   "round"
-                                         :patternTransform (str "translate(" (* -1 (:pos-x piece) width) "," (* -1 (:pos-y piece) height) ")")}}]])
+                    [:g {:transform (str "translate(" (* (:pos-x piece) 1.5 width) "," (* (:pos-y piece) 1.5 height) ")" " rotate(" (rand-int 360) ")")}
+                     [:path.gpu {:transform (str "translate(" (* (:pos-x piece) -1 width) "," (* (:pos-y piece) -1 height) ")")
+                                 :d         (cmr/curve->svg-path (transform (:curve piece) width height))
+                                 :style     {:fill         "url('#image')"
+                                             :stroke       "#888"
+                                             :stroke-width 1}}]])
                   (:pieces jigsaw)))
        ])]])

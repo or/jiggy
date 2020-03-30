@@ -17,13 +17,14 @@
 
 
 (def image-pattern
-  (let [image-url "img/8bit.gif"]
-    [:pattern {:id      "image"
-               :x       "0"
-               :y       "0"
-               :width   "100%"
-               :height  "100%"
-               :viewBox "0 0 540 810"
+  (let [image-url "img/8bit.png"]
+    [:pattern {:id                    "image"
+               :x                     "0"
+               :y                     "0"
+               :width                 "540"
+               :height                "810"
+               :pattern-units         "userSpaceOnUse"
+               :pattern-content-units "userSpaceOnUse"
                }
      [:image {:href                image-url
               :x                   0
@@ -110,7 +111,7 @@
                                 :height     "90vh"
                                 :border     "#888 1px solid"
                                 :background "url('img/felt-table.jpg')"}
-          :viewBox             "0 0 1400 600"
+          :viewBox             "0 0 1600 600"
           :preserveAspectRatio "xMidYMin meet"}
     [defs]
     (let [width  540
@@ -120,16 +121,22 @@
        [:rect {:width  width
                :height height
                :style  {:fill "url('#image')"}}]
-       (into  [:g]   (map (fn [[key curve]]
-                            ^{:key key} [:path {:d     (cmr/curve->svg-path (transform curve width height))
-                                                :style {:fill           "none"
-                                                        :stroke         "#888"
-                                                        :stroke-width   1
-                                                        :stroke-linecap "round"}}]) (:curves jigsaw)))
-       #_(into [:g] (map (fn [[[c r] point]]
-                           ^{:key [c r]} [:circle {:cx    (* (:x point) width)
-                                                   :cy    (* (:y point) height)
-                                                   :r     4
-                                                   :style {:fill "#ddd"}
-                                                   }]) (:points jigsaw)))]
-      )]])
+       (into [:g] (map (fn [[key curve]]
+                         ^{:key key} [:path {:d     (cmr/curve->svg-path (transform curve width height))
+                                             :style {:fill           "none"
+                                                     :stroke         "#888"
+                                                     :stroke-width   1
+                                                     :stroke-linecap "round"}}]) (:curves jigsaw)))
+       (into [:g {:transform "translate(600,0)"}]
+             (map (fn [piece]
+                    ^{:key (:id piece)}
+                    [:g {:transform (str "translate(" (* (:pos-x piece) 1.5 width) "," (* (:pos-y piece) 1.5 height) ")")}
+                     [:path {:transform (str "translate(" (* (:pos-x piece) -1 width) "," (* (:pos-y piece) -1 height) ")")
+                             :d         (cmr/curve->svg-path (transform (:curve piece) width height))
+                             :style     {:fill             "url('#image')"
+                                         :stroke           "#888"
+                                         :stroke-width     1
+                                         :stroke-linecap   "round"
+                                         :patternTransform (str "translate(" (* -1 (:pos-x piece) width) "," (* -1 (:pos-y piece) height) ")")}}]])
+                  (:pieces jigsaw)))
+       ])]])

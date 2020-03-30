@@ -85,6 +85,9 @@
 (defn shift [shift-x shift-y [x y]]
   [(+ x shift-x) (+ y shift-y)])
 
+(defn reverse-curve [curve]
+  (vec (reverse (map #(vec (reverse %)) curve))))
+
 (defn generate-pieces [jigsaw-width jigsaw-height curves]
   (into []
         (for [x (range jigsaw-width) y (range jigsaw-height)]
@@ -95,19 +98,19 @@
             (println "hori:" (* x 6) (* (inc x) 6))
             (let [curve-length 6
                   top          (subvec (curves [:horizontal y]) (* x curve-length) (* (inc x) curve-length))
-                  bottom       (subvec (curves [:horizontal (inc y)]) (* x curve-length) (* (inc x) curve-length))
-                  left         (subvec (curves [:vertical x]) (* y curve-length) (* (inc y) curve-length))
+                  bottom       (reverse-curve (subvec (curves [:horizontal (inc y)]) (* x curve-length) (* (inc x) curve-length)))
+                  left         (reverse-curve (subvec (curves [:vertical x]) (* y curve-length) (* (inc y) curve-length)))
                   right        (subvec (curves [:vertical (inc x)]) (* y curve-length) (* (inc y) curve-length))
                   mid-x        (/ (reduce + (map #(first (last (last %))) [top right bottom left])) 4)
                   mid-y        (/ (reduce + (map #(second (last (last %))) [top right bottom left])) 4)
-                  first-point  (last (last left))
                   ]
-              {:pos-x       mid-x
-               :pos-y       mid-y
-               :first-point (shift (- mid-x) (- mid-y) first-point)
-               :curve       (vec (map (fn [curve]
-                                        (vec (map (partial shift (- mid-x) (- mid-y)) curve)))
-                                      (concat top right bottom left)))})))))
+              {:id    [x y]
+               :pos-x mid-x
+               :pos-y mid-y
+               :curve (concat top right bottom left)
+               #_     (vec (map (fn [curve]
+                             (vec (map (partial shift (- mid-x) (- mid-y)) curve)))
+                           (concat top right bottom left)))})))))
 
 (defn generate [{:keys [jigsaw-width jigsaw-height eccentricity]}]
   (let [points (generate-points jigsaw-width jigsaw-height eccentricity)
